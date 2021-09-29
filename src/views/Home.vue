@@ -12,7 +12,7 @@
     <div>
       <CTable :columns="columns" :data="tableList" @trClick="handleDel"></CTable>
       <div v-if="tableList.length" class="total-box">
-        total: <span :class="totalWin > 0 ? 'red' : 'green'">{{ totalWin }}</span> + <span :class="totalOther > 0 ? 'red' : 'green'">{{ totalOther }}</span> = <span :class="totalWin + totalOther > 0 ? 'red' : 'green'">{{ totalWin + totalOther }}</span>
+        total: <span :class="totalIncome > 0 ? 'red' : 'green'">{{ totalIncome }}</span> + <span :class="totalOther > 0 ? 'red' : 'green'">{{ totalOther }}</span> = <span :class="totalIncome + totalOther > 0 ? 'red' : 'green'">{{ totalIncome + totalOther }}</span>
       </div>
     </div>
     <div class="btn-box">
@@ -30,7 +30,7 @@
             />
           </template>
         </van-field>
-        <van-field label="输赢" v-model="addData.win" placeholder="输赢"></van-field>
+        <van-field label="收入" v-model="addData.income" placeholder="收入"></van-field>
         <van-field label="其他" v-model="addData.other" placeholder="其他"></van-field>
         <van-field label="日志" v-model="addData.log" placeholder="日志"></van-field>
         <div style="margin: 16px;">
@@ -56,10 +56,10 @@ export default {
     return {
       columns: [
         { label: '日期', prop: 'date' },
-        { label: '输赢', prop: 'win', render(h, row) {
-          let { win } = row
-          win = win ? win * 1 : 0
-          return h('span', { class: win > 0 ? 'red' : 'green' }, win)
+        { label: '收入', prop: 'income', render(h, row) {
+          let { income } = row
+          income = income ? income * 1 : 0
+          return h('span', { class: income > 0 ? 'red' : 'green' }, income)
         } },
         { label: '其他', prop: 'other', render(h, row) {
           let { other } = row
@@ -72,13 +72,13 @@ export default {
       currentDate: new Date(),
       addData: {
         date: new Date(),
-        win: '',
+        income: '',
         other: '',
         log: ''
       },
       showAdd: false,
       totalOther: 0,
-      totalWin: 0
+      totalIncome: 0
     }
   },
   created() {
@@ -103,16 +103,16 @@ export default {
         date = new Date(currentDate)
       }
       const list = getData(moment(date || new Date()).format('YYYY-MM'))
-      let totalWin = 0, totalOther = 0
+      let totalIncome = 0, totalOther = 0
       console.log('list ====', list)
       if (list.length > 0) {
         list.forEach(i => {
-          totalWin += i.win * 1 || 0
+          totalIncome += i.income * 1 || 0
           totalOther += i.other * 1 || 0
         })
-        list.push({ date: '总计', win: totalWin, other: totalOther })
+        list.push({ date: '总计', income: totalIncome, other: totalOther })
       }
-      this.totalWin = totalWin
+      this.totalIncome = totalIncome
       this.totalOther = totalOther
       this.tableList = list
     },
