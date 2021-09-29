@@ -6,12 +6,35 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+        #app-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+        }
+    </style>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="app">
+        <div id="app-loading">加载中...</div>
+    </div>
+    <script>
+        const nodeDom = document.getElementById('app-loading')
+        let index = 1
+        const timer = setInterval(() => {
+           const loading = `加载中`
+            const dLen = 5
+            index += 1
+            if (index > dLen) index = 1
+            const dText = Array(index).fill('.').join('')
+            nodeDom.innerHTML = loading + dText
+        }, 500)
+        setTimeout(() => clearInterval(timer), 5000)
+    </script>
     <!-- built files will be auto injected -->
   </body>
 </html>
