@@ -24,8 +24,9 @@
           <template #input>
             <van-datetime-picker
                 v-model="addData.date"
-                type="date"
-                title="选择年月日"
+                cancel-button-text=" "
+                type="month-day"
+                title="选择月日"
             />
           </template>
         </van-field>
