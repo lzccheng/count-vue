@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="btn-box">
-      <van-button type="info" size="small" block @click="handleAdd">新增记录</van-button>
+      <van-button type="primary" size="small" block @click="handleAdd">新增记录</van-button>
     </div>
     <van-popup ref="addPopup" v-model="showAdd" position="bottom">
       <van-form @submit="handleAddSubmit">
