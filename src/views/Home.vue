@@ -33,7 +33,7 @@
         <van-field label="其他" v-model="addData.other" placeholder="其他"></van-field>
         <van-field label="日志" v-model="addData.log" placeholder="日志"></van-field>
         <div style="margin: 16px;">
-          <van-button round block type="info" sime="small" native-type="submit">新增</van-button>
+          <van-button round block type="primary" size="small" native-type="submit">新增</van-button>
         </div>
       </van-form>
     </van-popup>
