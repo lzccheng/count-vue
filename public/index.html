@@ -22,19 +22,6 @@
     <div id="app">
         <div id="app-loading">加载中...</div>
     </div>
-    <script>
-        const nodeDom = document.getElementById('app-loading')
-        let index = 1
-        const timer = setInterval(() => {
-           const loading = `加载中`
-            const dLen = 5
-            index += 1
-            if (index > dLen) index = 1
-            const dText = Array(index).fill('.').join('')
-            nodeDom.innerHTML = loading + dText
-        }, 500)
-        setTimeout(() => clearInterval(timer), 5000)
-    </script>
     <!-- built files will be auto injected -->
   </body>
 </html>
