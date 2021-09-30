@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <van-field label="用戶名" v-model="username" placeholder="用戶名"></van-field>
     <van-datetime-picker
         v-model="currentDate"
         type="year-month"
@@ -45,7 +46,7 @@
 // @ is an alias to /src
 import moment from 'moment'
 import CTable from '@/components/Table.vue'
-import { setData, getData, delData } from '@/utils/storage'
+import { setLS, getLS } from '@/utils/storage'
 
 export default {
   name: 'Home',
@@ -76,56 +77,70 @@ export default {
         other: '',
         log: ''
       },
+      username: '',
       showAdd: false,
       totalOther: 0,
       totalIncome: 0
     }
   },
   created() {
+    this.username = getLS('username')
     this.getTableList()
+  },
+  watch: {
+    username() {
+      setLS('username', this.username)
+    }
   },
   methods: {
     handleDel(item) {
       this.$dialog.confirm({
         title: '确认',
         message: `删除${item.date}记录？`
-      }).then(() => {
-        const formKey = moment(new Date()).format('YYYY-MM')
-        delData(formKey, item.id)
-        this.$notify({ type: 'success', message: '删除成功' })
-        this.getTableList()
+      }).then(async () => {
+        const formKey = moment(this.currentDate).format('YYYY-MM')
+        const { res } = await this.$api.delIncome({ username: this.username, formKey, id: item.id })
+        if (res) {
+          this.$notify({ type: 'success', message: '删除成功' })
+          this.getTableList()
+        }
       })
     },
-    getTableList() {
+    async getTableList() {
       let date
       const currentDate = this.currentDate
       if (currentDate) {
         date = new Date(currentDate)
       }
-      const list = getData(moment(date || new Date()).format('YYYY-MM'))
-      let totalIncome = 0, totalOther = 0
-      console.log('list ====', list)
-      if (list.length > 0) {
-        list.forEach(i => {
-          totalIncome += i.income * 1 || 0
-          totalOther += i.other * 1 || 0
-        })
-        list.push({ date: '总计', income: totalIncome, other: totalOther })
+      date = moment(date || new Date()).format('YYYY-MM')
+      const { res } = await this.$api.getIncomeList({ date, username: this.username })
+      if (res) {
+        const { data } = res
+        let totalIncome = 0, totalOther = 0
+        if (data.length > 0) {
+          data.forEach(i => {
+            totalIncome += i.income * 1 || 0
+            totalOther += i.other * 1 || 0
+          })
+          data.push({ date: '总计', income: totalIncome, other: totalOther })
+        }
+        this.totalIncome = totalIncome
+        this.totalOther = totalOther
+        this.tableList = data
       }
-      this.totalIncome = totalIncome
-      this.totalOther = totalOther
-      this.tableList = list
     },
     handleAdd() {
       this.showAdd = true
     },
-    handleAddSubmit() {
+    async handleAddSubmit() {
       const { date } = this.addData
       if (!date) return this.$notify('选择日期')
       const formKey = moment(date).format('YYYY-MM')
-      setData(formKey, { ...this.addData, id: +new Date(), date: moment(date).format('YYYY-MM-DD') })
-      this.getTableList()
-      this.$refs.addPopup.close()
+      const { res } = await this.$api.addIncome({ ...this.addData, date: moment(date).format('YYYY-MM-DD'), username: this.username, formKey })
+      if (res) {
+        this.getTableList()
+        this.$refs.addPopup.close()
+      }
     }
   }
 }
