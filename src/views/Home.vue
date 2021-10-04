@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <van-field label="用戶名" v-model="username" placeholder="用戶名"></van-field>
+<!--    <van-field label="用戶名" v-model="username" placeholder="用戶名"></van-field>-->
     <van-datetime-picker
         v-model="currentDate"
         type="year-month"
@@ -46,7 +46,7 @@
 // @ is an alias to /src
 import moment from 'moment'
 import CTable from '@/components/Table.vue'
-import { setLS, getLS } from '@/utils/storage'
+import { setLS, getLS, getData, setData, delData } from '@/utils/storage'
 
 export default {
   name: 'Home',
@@ -99,11 +99,14 @@ export default {
         message: `删除${item.date}记录？`
       }).then(async () => {
         const formKey = moment(this.currentDate).format('YYYY-MM')
-        const { res } = await this.$api.delIncome({ username: this.username, formKey, id: item.id })
-        if (res) {
-          this.$notify({ type: 'success', message: '删除成功' })
-          this.getTableList()
-        }
+        delData(formKey, item.id)
+        this.$notify({ type: 'success', message: '删除成功' })
+        this.getTableList()
+        // const { res } = await this.$api.delIncome({ username: this.username, formKey, id: item.id })
+        // if (res) {
+        //   this.$notify({ type: 'success', message: '删除成功' })
+        //   this.getTableList()
+        // }
       })
     },
     async getTableList() {
@@ -113,9 +116,11 @@ export default {
         date = new Date(currentDate)
       }
       date = moment(date || new Date()).format('YYYY-MM')
-      const { res } = await this.$api.getIncomeList({ date, username: this.username })
+      // const { res } = await this.$api.getIncomeList({ date, username: this.username })
+      const res = getData(date)
       if (res) {
-        const { data } = res
+        // const { data } = res
+        const data = res
         let totalIncome = 0, totalOther = 0
         if (data.length > 0) {
           data.forEach(i => {
@@ -136,11 +141,14 @@ export default {
       const { date } = this.addData
       if (!date) return this.$notify('选择日期')
       const formKey = moment(date).format('YYYY-MM')
-      const { res } = await this.$api.addIncome({ ...this.addData, date: moment(date).format('YYYY-MM-DD'), username: this.username, formKey })
-      if (res) {
-        this.getTableList()
-        this.$refs.addPopup.close()
-      }
+      setData(formKey, { ...this.addData, date: moment(date).format('YYYY-MM-DD'), id: +new Date() })
+      this.getTableList()
+      this.$refs.addPopup.close()
+      // const { res } = await this.$api.addIncome({ ...this.addData, date: moment(date).format('YYYY-MM-DD'), username: this.username, formKey })
+      // if (res) {
+      //   this.getTableList()
+      //   this.$refs.addPopup.close()
+      // }
     }
   }
 }
