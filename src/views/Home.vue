@@ -24,6 +24,9 @@
     <van-popup ref="showMonth" v-model="showMonth" position="bottom">
       <van-field label="年份" v-model="year"></van-field>
       <CTable :columns="columns" :data="monthList"></CTable>
+      <div class="center">
+        合计：<span :class="monthTotal > 0 ? 'red' : 'green'">{{ monthTotal }}</span>
+      </div>
       <div class="mar16">
         <van-button round block type="warning" size="small" @click="handleMonthSearch">查询</van-button>
       </div>
@@ -92,7 +95,9 @@ export default {
       showMonth: false,
       year: new Date().getFullYear(),
       totalOther: 0,
-      totalIncome: 0
+      totalIncome: 0,
+      mTotalother: 0,
+      mTotalIncome: 0
     }
   },
   created() {
@@ -102,6 +107,11 @@ export default {
   watch: {
     username() {
       setLS('username', this.username)
+    }
+  },
+  computed: {
+    monthTotal() {
+      return this.mTotalIncome + this.mTotalother
     }
   },
   methods: {
@@ -170,6 +180,8 @@ export default {
             totalIncome += i.income
             totalOther += i.other
           })
+          this.mTotalIncome = totalIncome
+          this.mTotalother = totalOther
           list.push({ date: '总计', income: totalIncome, other: totalOther })
         }
         this.monthList = list

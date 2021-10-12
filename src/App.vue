@@ -17,4 +17,7 @@
 .red {
   color: red;
 }
+.center {
+  text-align: center;
+}
 </style>
