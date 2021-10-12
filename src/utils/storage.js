@@ -8,7 +8,7 @@ export const setLS = (key, val) => {
 
 export const getLS = key => JSON.parse(localStorage.getItem(key))
 
-const formsName = 'forms'
+export const formsName = 'forms'
 
 export const getData = formKey => {
     const forms = getLS(formsName)

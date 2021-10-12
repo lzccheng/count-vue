@@ -18,7 +18,16 @@
     </div>
     <div class="btn-box">
       <van-button type="primary" size="small" block @click="handleAdd">新增记录</van-button>
+      <br>
+      <van-button type="warning" size="small" block @click="handleShowMonth">查看月收益</van-button>
     </div>
+    <van-popup ref="showMonth" v-model="showMonth" position="bottom">
+      <van-field label="年份" v-model="year"></van-field>
+      <CTable :columns="columns" :data="monthList"></CTable>
+      <div class="mar16">
+        <van-button round block type="warning" size="small" @click="handleMonthSearch">查询</van-button>
+      </div>
+    </van-popup>
     <van-popup ref="addPopup" v-model="showAdd" position="bottom">
       <van-form @submit="handleAddSubmit">
         <van-field label="日期">
@@ -34,7 +43,7 @@
         <van-field label="收入" v-model="addData.income" placeholder="收入"></van-field>
         <van-field label="其他" v-model="addData.other" placeholder="其他"></van-field>
         <van-field label="日志" v-model="addData.log" placeholder="日志"></van-field>
-        <div style="margin: 16px;">
+        <div class="mar16">
           <van-button round block type="primary" size="small" native-type="submit">新增</van-button>
         </div>
       </van-form>
@@ -46,7 +55,7 @@
 // @ is an alias to /src
 import moment from 'moment'
 import CTable from '@/components/Table.vue'
-import { setLS, getLS, getData, setData, delData } from '@/utils/storage'
+import { setLS, getLS, getData, setData, delData, formsName } from '@/utils/storage'
 
 export default {
   name: 'Home',
@@ -70,6 +79,7 @@ export default {
         { label: '日志', prop: 'log' },
       ],
       tableList: [],
+      monthList: [],
       currentDate: new Date(),
       addData: {
         date: new Date(),
@@ -79,6 +89,8 @@ export default {
       },
       username: '',
       showAdd: false,
+      showMonth: false,
+      year: new Date().getFullYear(),
       totalOther: 0,
       totalIncome: 0
     }
@@ -134,6 +146,39 @@ export default {
         this.tableList = data
       }
     },
+    handleMonthSearch() {
+      const data = getLS(formsName)
+      const year = `${this.year}`
+      if (data) {
+        const obj = {}
+        const list = []
+        for(let key in data) {
+          const reg = new RegExp(year)
+          reg.test(key) && (obj[key] = data[key])
+        }
+        for(let date in obj) {
+          let income = 0, other = 0
+          obj[date].forEach(i => {
+            income += i.income * 1
+            other += i.other * 1
+          })
+          list.push({ date, income, other })
+        }
+        if (list.length) {
+          let totalIncome = 0, totalOther = 0
+          list.forEach(i => {
+            totalIncome += i.income
+            totalOther += i.other
+          })
+          list.push({ date: '总计', income: totalIncome, other: totalOther })
+        }
+        this.monthList = list
+      }
+    },
+    handleShowMonth() {
+      this.showMonth = true
+      this.handleMonthSearch()
+    },
     handleAdd() {
       this.showAdd = true
     },
@@ -161,5 +206,8 @@ export default {
 .total-box {
   text-align: center;
   margin: 20px 0;
+}
+.mar16 {
+  margin: 16px;
 }
 </style>
