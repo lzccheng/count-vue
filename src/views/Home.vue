@@ -23,7 +23,7 @@
     </div>
     <van-popup ref="showMonth" v-model="showMonth" position="bottom">
       <van-field label="年份" v-model="year"></van-field>
-      <CTable :columns="columns" :data="monthList"></CTable>
+      <CTable :columns="monthColumns" :data="monthList"></CTable>
       <div class="center">
         合计：<span :class="monthTotal > 0 ? 'red' : 'green'">{{ monthTotal }}</span>
       </div>
@@ -67,6 +67,24 @@ export default {
   },
   data() {
     return {
+      monthColumns: [
+        { label: '日期', prop: 'date' },
+        { label: '收入', prop: 'income', render(h, row) {
+          let { income } = row
+          income = income ? income * 1 : 0
+          return h('span', { class: income > 0 ? 'red' : 'green' }, income)
+        } },
+        { label: '其他', prop: 'other', render(h, row) {
+          let { other } = row
+          other = other ? other * 1 : 0
+          return h('span', { class: other > 0 ? 'red' : 'green' }, other)
+        } },
+        { label: '合计', prop: 'total', render(h, row) {
+          let { total } = row
+          total = total ? total * 1 : 0
+          return h('span', { class: total > 0 ? 'red' : 'green' }, total)
+        } }
+      ],
       columns: [
         { label: '日期', prop: 'date' },
         { label: '收入', prop: 'income', render(h, row) {
@@ -172,7 +190,7 @@ export default {
             income += i.income * 1
             other += i.other * 1
           })
-          list.push({ date, income, other })
+          list.push({ date, income, other, total: income + other })
         }
         if (list.length) {
           let totalIncome = 0, totalOther = 0
@@ -182,7 +200,7 @@ export default {
           })
           this.mTotalIncome = totalIncome
           this.mTotalother = totalOther
-          list.push({ date: '总计', income: totalIncome, other: totalOther })
+          list.push({ date: '总计', income: totalIncome, other: totalOther, total: totalIncome + totalOther })
         }
         this.monthList = list
       }
